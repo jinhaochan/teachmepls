@@ -1,0 +1,116 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+    <title>Quiz Results - {{ level|capitalize }} Level</title>
+    <style>
+        #loading {
+            display: none;
+            margin-top: 1em;
+            color: #007bff;
+            font-weight: bold;
+        }
+        .header-nav {
+            margin-bottom: 2em;
+        }
+        .header-nav a {
+            margin-right: 1em;
+            text-decoration: none;
+            color: #007bff;
+            font-weight: bold;
+        }
+        .subtopic-score-block {
+            margin-bottom: 1em;
+            padding: 0.5em;
+            background: #f7f7f7;
+            border-radius: 4px;
+        }
+        .debug-btn {
+            margin-top: 1em;
+            background: #ff9800;
+            color: #fff;
+            border: none;
+            padding: 0.5em 1em;
+            border-radius: 4px;
+            cursor: pointer;
+        }
+    </style>
+    <script>
+        function showLoadingAndDisableBtn(event) {
+            document.getElementById('loading').style.display = 'block';
+            var btn = event.target.querySelector('button[type="submit"]');
+            if (btn) {
+                btn.disabled = true;
+            }
+        }
+        window.onload = function() {
+            document.getElementById('gate-form').onsubmit = showLoadingAndDisableBtn;
+            var debugForm = document.getElementById('debug-form');
+            if (debugForm) {
+                debugForm.onsubmit = showLoadingAndDisableBtn;
+            }
+        }
+    </script>
+</head>
+<body>
+    <div class="container">
+        <div class="header-nav">
+            <a href="{{ url_for('index') }}">🏠 Home</a>
+        </div>
+        <h1>Quiz Results: {{ level|capitalize }} Level</h1>
+        <h2>Feedback</h2>
+        <ul>
+            {% if results %}
+                {% for subtopic, items in results.items() %}
+                    {% for item in items %}
+                        <li>
+                            <strong>Subtopic:</strong> {{ subtopic }}<br>
+                            <strong>Question:</strong> {{ item.question }}<br>
+                            <strong>Answer:</strong> {{ item.answer }}
+                            <strong>Score:</strong> {{ item.score }}<br>
+                            <strong>Feedback:</strong> {{ item.feedback }}
+                        </li>
+                    {% endfor %}
+                {% endfor %}
+            {% else %}
+                <li>No feedback available.</li>
+            {% endif %}
+        </ul>
+        <h2>Subtopic Scores</h2>
+        {% if subtopic_avg_scores %}
+            {% for subtopic, score in subtopic_avg_scores.items() %}
+                <div class="subtopic-score-block">
+                    <strong>{{ subtopic }}:</strong> {{ "%.2f"|format(score) }}
+                </div>
+            {% endfor %}
+        {% endif %}
+        <h2>Gate Decision</h2>
+        <p><strong>Advance to next level?</strong> {{ "Yes" if advance else "No" }}</p>
+        <p><strong>Reason:</strong> {{ reason }}</p>
+        {% if additional_subtopics %}
+            <h3>Additional subtopics to cover:</h3>
+            <ul>
+                {% for subtopic in additional_subtopics %}
+                    <li>{{ subtopic }}</li>
+                {% endfor %}
+            </ul>
+        {% endif %}
+        <form id="gate-form" method="POST">
+            {% if completed %}
+                <button type="submit">Finish</button>
+            {% elif advance %}
+                <button type="submit">Advance to Next Level</button>
+            {% else %}
+                <button type="submit">Try Again</button>
+            {% endif %}
+            <div id="loading">Loading, please wait...</div>
+        </form>
+        <form id="debug-form" method="POST" action="{{ url_for('gate') }}">
+            <input type="hidden" name="debug_pass" value="1">
+            <button type="submit" class="debug-btn">Debug: Simulate Pass</button>
+        </form>
+    </div>
+</body>
+</html>

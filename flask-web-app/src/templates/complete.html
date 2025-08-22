@@ -1,0 +1,21 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+    <title>Quiz Complete</title>
+</head>
+<body>
+    <div class="header-nav">
+        <a href="{{ url_for('index') }}">🏠 Home</a>
+    </div>
+    <div class="container">
+        <h1>Congratulations!</h1>
+        <p>You have completed all levels for your selected topic.</p>
+        <form action="{{ url_for('reset') }}" method="GET">
+            <button type="submit">Start Over</button>
+        </form>
+    </div>
+</body>
+</html>

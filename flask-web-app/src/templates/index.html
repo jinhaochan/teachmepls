@@ -1,0 +1,54 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+    <title>Flask Web App</title>
+    <style>
+        #loading {
+            display: none;
+            margin-top: 1em;
+            color: #007bff;
+            font-weight: bold;
+        }
+        .input-block {
+            margin-bottom: 2em;
+        }
+        input[type="text"] {
+            width: 100%;
+            padding: 0.5em;
+            margin-top: 0.5em;
+        }
+    </style>
+    <script>
+        function showLoadingAndDisableBtn(event) {
+            document.getElementById('loading').style.display = 'block';
+            var btn = event.target.querySelector('button[type="submit"]');
+            if (btn) {
+                btn.disabled = true;
+            }
+        }
+        window.onload = function() {
+            document.getElementById('topic-form').onsubmit = showLoadingAndDisableBtn;
+        }
+    </script>
+</head>
+<body>
+    <div class="container">
+        <h1>Welcome to the Flask Web App</h1>
+        <form id="topic-form" action="/" method="POST">
+            <div class="input-block">
+                <label for="topic">Enter a topic to be quizzed on:</label><br>
+                <input type="text" id="topic" name="topic" required autocomplete="off">
+            </div>
+            <button type="submit">Submit</button>
+            <div id="loading">Loading, please wait...</div>
+        </form>
+        {% if output %}
+            <h2>You entered:</h2>
+            <p>{{ output }}</p>
+        {% endif %}
+    </div>
+</body>
+</html>

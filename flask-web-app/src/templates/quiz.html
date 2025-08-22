@@ -1,0 +1,72 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+    <title>Quiz - {{ level|capitalize }} Level</title>
+    <style>
+        .subtopic-block {
+            margin-bottom: 2em;
+            padding: 1em;
+            border: 1px solid #eee;
+            border-radius: 6px;
+            background: #fafafa;
+        }
+        .question-block {
+            margin-bottom: 1.5em;
+        }
+        textarea {
+            width: 100%;
+            min-height: 60px;
+            margin-top: 0.5em;
+        }
+        #loading {
+            display: none;
+            margin-top: 1em;
+            color: #007bff;
+            font-weight: bold;
+        }
+    </style>
+    <script>
+        function showLoadingAndDisableBtn(event) {
+            document.getElementById('loading').style.display = 'block';
+            var btn = event.target.querySelector('button[type="submit"]');
+            if (btn) {
+                btn.disabled = true;
+            }
+        }
+        window.onload = function() {
+            document.getElementById('quiz-form').onsubmit = showLoadingAndDisableBtn;
+        }
+    </script>
+</head>
+<body>
+    <div class="container">
+        <div class="header-nav">
+            <a href="{{ url_for('index') }}">🏠 Home</a>
+        </div>
+        <h1>Quiz: {{ level|capitalize }} Level</h1>
+        <form id="quiz-form" action="{{ url_for('quiz') }}" method="POST">
+            {% set subtopic_map = {} %}
+            {% for q in questions %}
+                {% set _ = subtopic_map.setdefault(q.subtopic, []).append(q.question) %}
+            {% endfor %}
+            {% for subtopic, qs in subtopic_map.items() %}
+                {% set outer_loop = loop %}
+                <div class="subtopic-block">
+                    <h2>{{ subtopic }}</h2>
+                    {% for question in qs %}
+                        <div class="question-block">
+                            <label for="answer_{{ subtopic }}_{{ outer_loop.index }}">Q{{ outer_loop.index }}: {{ question }}</label><br>
+                            <textarea id="answer_{{ subtopic }}_{{ outer_loop.index }}" name="answer_{{ subtopic }}_{{ outer_loop.index }}" required autocomplete="off"></textarea>
+                        </div>
+                    {% endfor %}
+                </div>
+            {% endfor %}
+            <button type="submit">Submit Answers</button>
+            <div id="loading">Loading, please wait...</div>
+        </form>
+    </div>
+</body>
+</html>
